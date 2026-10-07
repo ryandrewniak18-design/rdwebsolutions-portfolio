@@ -6,11 +6,17 @@ services:
       - .:/app:ro
     ports:
       - "3000:3000"
-    command: ["python", "-m", "http.server", "3000", "--bind", "0.0.0.0"]
+    env_file:
+      - path: /run/base44/app.env
+        required: false
+    environment:
+      - WATCHFILES_FORCE_POLLING=true
+      - AUDIT_ALLOWED_ORIGIN=https://3000-${BASE44_PUBLIC_HOST_SUFFIX}
+    command: ["sh", "-ec", "pip install --no-cache-dir -r requirements.base44.txt && exec watchfiles --filter python 'python server.py' /app"]
     restart: on-failure
     healthcheck:
-      test: ["CMD", "python", "-c", "import urllib.request; r = urllib.request.urlopen('http://127.0.0.1:3000/', timeout=3); assert r.status == 200 and b'RD Web Solutions' in r.read()"]
+      test: ["CMD", "python", "-c", "import urllib.request; r = urllib.request.urlopen('http://127.0.0.1:3000/', timeout=3); assert r.status == 200 and b'RPD Business LLC' in r.read()"]
       interval: 10s
       timeout: 5s
-      start_period: 5s
+      start_period: 30s
       retries: 3

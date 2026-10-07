@@ -2,5 +2,11 @@
   "previewPort": 3000,
   "healthPath": "/",
   "startCommand": "docker compose -f docker-compose.base44.yml up -d",
-  "secrets": []
+  "secrets": [
+    {"name": "SMTP_HOST", "description": "SMTP hostname from your email provider's outgoing mail settings.", "requiredAtBoot": false},
+    {"name": "SMTP_USERNAME", "description": "SMTP login from your email provider; for Gmail this is your full email address.", "requiredAtBoot": false},
+    {"name": "SMTP_PASSWORD", "description": "SMTP password or app password from your email provider; Gmail requires a Google Account app password.", "requiredAtBoot": false},
+    {"name": "SMTP_FROM", "description": "Sender email address authorized by your SMTP provider.", "requiredAtBoot": false},
+    {"name": "SMTP_PORT", "description": "Optional SMTP port; defaults to 587 with verified STARTTLS. Port 465 uses verified implicit TLS.", "requiredAtBoot": false}
+  ]
 }

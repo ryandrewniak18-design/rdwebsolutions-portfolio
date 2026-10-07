@@ -1,7 +1,11 @@
 # Project notes
 
-- This checkout now contains a standalone RD Web Solutions website in `index.html` and `styles.css`; there is no external redirect or JavaScript framework.
-- The Base44 Compose service serves the bind-mounted checkout directly with Python's static HTTP server. No dependencies, database, migrations, or credentials are required.
-- Files are read on every request; there is no browser live-reload mechanism. Reload the preview after edits.
-- Verify locally with `curl -fsS http://localhost:3000/`, `curl -fsS http://localhost:3000/styles.css`, and `docker compose -f docker-compose.base44.yml ps`. Check tablet and mobile layouts in preview.
-- Contact and plan links use `mailto:` to the existing business email. They open the visitor's email application; there is no server-side form delivery or payment processing.
+- This checkout recreates the public content from `https://rpd-growth-engine.base44.app/` on five routes: `/`, `/services/`, `/work/`, `/about/`, `/contact/`. Case-study statuses and baseline metrics are source content, not live tracking data; do not invent performance numbers.
+- Pages are standalone HTML for direct loads. `site.js` shares the header/footer and enhances internal navigation with fetched HTML and history. `motion.js` progressively enhances visible content; never hide content until scripts run. `contact.js` delegates submission so it survives page navigation.
+- Run the Base44 Compose service from the bind-mounted source. Python changes restart via watchfiles polling; HTML/CSS/JS changes need a preview refresh. No database or migrations are required.
+- Verify every route with curl, plus local scripts and CSS. Browser checks: internal page navigation, FAQ expansion, mobile menu, required-field validation, audit error/success states, and reduced-motion handling.
+- Audit requests POST JSON to `/api/audit`. They are sent to `rpdbusinessllc@gmail.com` using SMTP_HOST, SMTP_USERNAME, SMTP_PASSWORD, and SMTP_FROM from the platform-managed env file. SMTP_PORT defaults to 587 (verified STARTTLS); 465 uses verified TLS. No requests are stored locally. Missing SMTP returns 503 and explicitly says nothing was sent; never claim delivery from a frontend success state alone.
+- Compose sets AUDIT_ALLOWED_ORIGIN to the dynamic public preview URL for same-origin POST protection. This is an ordinary deployment setting, not an auth bypass; outside Compose, the server defaults to matching Origin against Host. Production reverse-proxy deployments should set the exact public origin. No sandbox-specific shared code overrides are used.
+- The app uses public source images and Google Fonts. Navigation/content still work with scripts/fonts disabled (each page's source is readable); external image availability remains external.
+- The contact sender includes a honeypot, strict size/field validation, and a five-attempt/ten-minute SMTP limit per peer IP. Reverse-proxied production hosting should apply edge abuse controls; do not trust arbitrary forwarding headers as client identity.
+- Credentials are optional at boot, mandatory for delivery. After updating platform secrets, let the platform recreate the service; do not race it with a Compose restart. Verify key presence without printing values.
